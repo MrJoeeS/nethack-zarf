@@ -1,0 +1,9 @@
+# Container sysconf for browser NetHack (ttyd).
+# Based on NetHack 5.0 sys/unix/sysconf with paths/tools removed that
+# are not present in the runtime image.
+
+WIZARDS=root games nethack
+EXPLORERS=*
+GENERICUSERS=play player game games nethack nethacker
+MAXPLAYERS=10
+MAX_REROLL_RATE=0

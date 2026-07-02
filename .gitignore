@@ -1,0 +1,13 @@
+zarf-package-*.tar.zst
+*.tar.zst
+zarf-config.toml
+
+# Local image build artifacts
+.nethack-build/
+
+# Editor / OS
+.DS_Store
+*.swp
+.idea/
+.vscode/
+blog.md

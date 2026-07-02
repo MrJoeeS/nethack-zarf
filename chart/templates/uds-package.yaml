@@ -1,0 +1,24 @@
+apiVersion: uds.dev/v1alpha1
+kind: Package
+metadata:
+  name: {{ include "nethack.name" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  network:
+    serviceMesh:
+      mode: ambient
+    expose:
+      - service: {{ include "nethack.fullname" . }}
+        selector:
+          app.kubernetes.io/name: {{ include "nethack.name" . }}
+        gateway: {{ .Values.uds.gateway }}
+        host: {{ .Values.uds.host }}
+        port: {{ .Values.service.port }}
+    allow:
+      - direction: Ingress
+        remoteGenerated: IntraNamespace
+      - direction: Egress
+        remoteGenerated: IntraNamespace
+      {{- with .Values.additionalNetworkAllow }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}

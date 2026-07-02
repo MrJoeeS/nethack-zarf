@@ -1,0 +1,82 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+env:
+  IMAGE: docker.io/mrjoees/nethack
+  ZARF_VERSION: v0.79.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve version from tag
+        id: version
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "version=${VERSION}" >> "${GITHUB_OUTPUT}"
+          echo "Release version: ${VERSION}"
+
+      - name: Update package manifests for release
+        run: ./scripts/prepare-release.sh "${{ steps.version.outputs.version }}"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build container image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          platforms: linux/amd64
+          tags: |
+            ${{ env.IMAGE }}:${{ steps.version.outputs.version }}
+          build-args: |
+            NETHACK_REF=NetHack-5.0
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Install Zarf
+        uses: zarf-dev/setup-zarf@v1.0.1
+        with:
+          version: ${{ env.ZARF_VERSION }}
+
+      - name: Create Zarf package
+        run: zarf package create . --confirm
+
+      - name: Push container image to Docker Hub
+        run: |
+          docker tag "${{ env.IMAGE }}:${{ steps.version.outputs.version }}" "${{ env.IMAGE }}:latest"
+          docker push "${{ env.IMAGE }}:${{ steps.version.outputs.version }}"
+          docker push "${{ env.IMAGE }}:latest"
+
+      - name: Upload Zarf package artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: zarf-package
+          path: zarf-package-nethack-amd64-*.tar.zst
+          if-no-files-found: error
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: zarf-package-nethack-amd64-*.tar.zst
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
