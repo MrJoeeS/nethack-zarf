@@ -41,8 +41,6 @@ Without UDS ingress: `zarf connect nethack`
 | NetHack version | `NETHACK_REF` build-arg in `Dockerfile` |
 | Package/image version | `zarf.yaml` + Helm values |
 
-Default `nethackrc`: autopickup on, `o` bound to travel. Vanilla 5.0 has no autoexplore.
-
 ## Layout
 
 | Path | Purpose |
