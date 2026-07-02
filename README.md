@@ -1,6 +1,6 @@
 # NetHack on UDS with Zarf
 
-Build [NetHack 5.0](https://github.com/NetHack/NetHack) from source, serve it in the browser via [ttyd](https://github.com/tsl0922/ttyd), and deploy to [UDS Core](https://docs.defenseunicorns.com/core/) with [Zarf](https://docs.zarf.dev/).
+Build [NetHack 5.0](https://github.com/NetHack/NetHack) from source, serve it in the browser via [ttyd](https://github.com/tsl0922/ttyd), and deploy to [UDS Core](https://docs.defenseunicorns.com/core/) with [Zarf](https://docs.zarf.dev/). See a write up of this repo at [Zarfing Up Nethack](https://whatwediscuss.com/software/zarfing-up-nethack)
 
 **URL after deploy:** `https://nethack.<domain>` (e.g. `https://nethack.uds.dev`)
 
